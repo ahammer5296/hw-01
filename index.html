@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precision3D | Реверс-инжиниринг и 3D печать</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a142f;
+            --secondary: #112240;
+            --accent: #0066cc;
+            --light: #f0f8ff;
+            --gray: #5a6a8a;
+            --white: #ffffff;
+            --light-gray: #f5f7fa;
+            --transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 300;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--secondary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--primary);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 102, 204, 0.2);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 28px;
+            font-weight: 500;
+            color: var(--white);
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .logo i {
+            margin-right: 12px;
+            color: var(--accent);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 35px;
+            position: relative;
+        }
+
+        nav ul li a {
+            color: var(--light);
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 400;
+            transition: var(--transition);
+            position: relative;
+            letter-spacing: 0.5px;
+            padding: 8px 5px;
+        }
+
+        nav ul li a:hover {
+            color: var(--accent);
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--accent);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 400;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 5px 15px rgba(0, 102, 204, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.4);
+            background: #0055aa;
+        }
+
+        .mobile-menu {
+            display: none;
+            font-size: 28px;
+            color: var(--white);
+            cursor: pointer;
+            background: rgba(0, 102, 204, 0.1);
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: 
+                linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)), 
+                url('https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            padding-top: 80px;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 25px;
+            line-height: 1.15;
+            font-weight: 600;
+        }
+
+        .hero h1 span {
+            color: var(--accent);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            color: var(--gray);
+            max-width: 700px;
+            font-weight: 300;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .btn-outline {
+            display: inline-block;
+            padding: 12px 35px;
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 400;
+            transition: var(--transition);
+            cursor: pointer;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-outline:hover {
+            background: rgba(0, 102, 204, 0.05);
+            transform: translateY(-3px);
+        }
+
+        /* Features Section */
+        .features {
+            background-color: var(--light-gray);
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 40px 30px;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 102, 204, 0.1);
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent);
+        }
+
+        .feature-icon {
+            font-size: 3.5rem;
+            color: var(--accent);
+            margin-bottom: 25px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            font-size: 1.1rem;
+            font-weight: 300;
+            line-height: 1.8;
+        }
+
+        /* About Section */
+        .section {
+            padding: 120px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-title h2 {
+            font-size: 2.8rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--accent);
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 800px;
+            margin: 25px auto 0;
+            font-size: 1.2rem;
+            font-weight: 300;
+            line-height: 1.8;
+        }
+
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .about-text {
+            flex: 1;
+        }
+
+        .about-text h3 {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .about-text p {
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--gray);
+            font-weight: 300;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: var(--light-gray);
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 500;
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--primary);
+            font-weight: 400;
+        }
+
+        .about-image {
+            flex: 1;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .about-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.8s ease;
+        }
+
+        .about-image:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Services Section */
+        .services {
+            background-color: var(--light-gray);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .service-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 40px 35px;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 102, 204, 0.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0,  ̈0.1);
+            border-color: var(--accent);
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 25px;
+        }
+
+        .service-card h3 {
+            font-size: 1.7rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .service-card p {
+            color: var(--gray);
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .service-card ul {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+
+        .service-card ul li {
+            margin-bottom: 12px;
+            color: var(--gray);
+            position: relative;
+            font-weight: 300;
+        }
+
+        .service-card ul li::before {
+            content: '▹';
+            color: var(--accent);
+            position: absolute;
+            left: -20px;
+        }
+
+        /* Portfolio Section */
+        .portfolio {
+            background-color: var(--white);
+            position: relative;
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .portfolio-item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            height: 380px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .portfolio-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .portfolio-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 20, 47, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: var(--transition);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .portfolio-item:hover .portfolio-overlay {
+            opacity: 1;
+        }
+
+        .portfolio-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .portfolio-overlay h3 {
+            font-size: 1.7rem;
+            margin-bottom: 15px;
+            color: var(--white);
+            font-weight: 500;
+        }
+
+        .portfolio-overlay p {
+            color: var(--light);
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .portfolio-tag {
+            display: inline-block;
+            padding: 8px 20px;
+            background: var(--accent);
+            color: var(--white);
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Contact Section */
+        .contact {
+            background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)), 
+                        url('https://images.unsplash.com/photo-1518997554305-5c6ef0c1e87e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=5');
+            background-size: cover;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-container {
+            display: flex;
+            gap: 60px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .contact-info {
+            flex: 1;
+            background: var(--primary);
+            padding: 40px;
+            border-radius: 15px;
+            color: var(--white);
+        }
+
+        .contact-info h3 {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .contact-info p {
+            margin-bottom: 35px;
+            color: var(--light);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        .contact-details {
+            margin-bottom: 40px;
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+
+        .contact-detail i {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-right: 20px;
+            min-width: 40px;
+            padding-top: 5px;
+        }
+
+        .contact-detail div h4 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            color: var(--white);
+            font-weight: 500;
+        }
+
+        .contact-detail div p {
+            margin-bottom: 0;
+            color: var(--light);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 102, 204, 0.2);
+            color: var(--accent);
+            transition: var(--transition);
+            font-size: 1.5rem;
+        }
+
+        .social-links a:hover {
+            background: var(--accent);
+            color: var(--white);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 102, 204, 0.3);
+        }
+
+        .contact-form {
+            flex: 1;
+            background: var(--white);
+            padding: 50px 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 12px;
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--light-gray);
+            border: 1px solid rgba(0, 102, 204, 0.1);
+            border-radius: 8px;
+            color: var(--primary);
+            font-size: 1.1rem;
+            transition: var(--transition);
+            font-weight: 300;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
+        }
+
+        .form-group textarea {
+            height: 180px;
+            resize: vertical;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary);
+            padding: 70px 0 30px;
+            border-top: 1px solid rgba(0, 102, 204, 0.1);
+            color: var(--light);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-about {
+            padding-right: 20px;
+        }
+
+        .footer-logo {
+            font-size: 28px;
+            font-weight: 500;
+            color: var(--white);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-logo span {
+            color: var(--accent);
+        }
+
+        .footer-logo i {
+            margin-right: 12px;
+            color: var(--accent);
+        }
+
+        .footer-about p {
+            color: var(--light);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        .footer-links h3 {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--white);
+            position: relative;
+            padding-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .footer-links h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--accent);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links ul li {
+            margin-bottom: 15px;
+        }
+
+        .footer-links ul li a {
+            color: var(--light);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 1.1rem;
+            display: block;
+            padding: 8px 0;
+            font-weight: 300;
+        }
+
+        .footer-links ul li a:hover {
+            color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .footer-newsletter p {
+            color: var(--light);
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 14px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 102, 204, 0.3);
+            border-radius: 8px;
+            color: var(--white);
+            font-size: 1rem;
+            font-weight: 300;
+        }
+
+        .newsletter-form input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .newsletter-form button {
+            padding: 14px 25px;
+            background: var(--accent);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .newsletter-form button:hover {
+            background: #0055aa;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            font-size: 1rem;
+            font-weight: 300;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .about-content,
+            .contact-container {
+                flex-direction: column;
+            }
+            
+            .about-image {
+                margin-top: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                background: var(--primary);
+                flex-direction: column;
+                padding: 20px 0;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+                border-top: 1px solid rgba(0, 102, 204, 0.2);
+            }
+            
+            nav ul.show {
+                display: flex;
+            }
+            
+            nav ul li {
+                margin: 0;
+                text-align: center;
+                padding: 15px 0;
+            }
+            
+            .mobile-menu {
+                display: block;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+            }
+            
+            .section-title h2 {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-cube"></i>
+                <span>Precision<span>3D</span></span>
+            </div>
+            <nav>
+                <ul id="menu">
+                    <li><a href="#hero">Главная</a></li>
+                    <li><a href="#features">Преимущества</a></li>
+                    <li><a href="#about">О нас</a></li>
+                    <li><a href="#services">Услуги</a></li>
+                    <li><a href="#portfolio">Портфолио</a></li>
+                    <li><a href="#contact">Контакты</a></li>
+                </ul>
+                <a href="#contact" class="cta-button">Заказать проект</a>
+                <div class="mobile-menu" id="mobileMenu">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Экспертные решения в <span>3D печати</span> и реверс-инжиниринге</h1>
+                <p>Превращаем сложные технические задачи в реализованные проекты с помощью передовых технологий 3D сканирования, моделирования и печати.</p>
+                <div class="hero-buttons">
+                    <a href="#contact" class="cta-button">Обсудить проект</a>
+                    <a href="#portfolio" class="btn-outline">Наши работы</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Наши преимущества</h2>
+                <p>Почему промышленные предприятия выбирают сотрудничество с нами</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+                    <h3>Точность до микрона</h3>
+                    <p>Используем прецизионное оборудование для сканирования и печати с точностью до 10 микрон</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Экспертные знания</h3>
+                    <p>Команда инженеров с опытом работы более 15 лет в аэрокосмической и медицинской отраслях</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Оперативность</h3>
+                    <p>Средний срок реализации проекта - 72 часа благодаря автоматизированным процессам</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section" id="about">
+        <div class="container">
+            <div class="section-title">
+                <h2>О компании</h2>
+                <p>Precision3D - лидер в области реверс-инжиниринга и промышленной 3D печати</p>
+            </div>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>Инженерное искусство в каждой детали</h3>
+                    <p>Основанная в 2010 году, компания Precision3D стала синонимом инноваций в сфере реверс-инжиниринга и аддитивных технологий. Наши решения применяются в аэрокосмической промышленности, медицине, автомобилестроении и искусстве.</p>
+                    <p>Мы объединяем передовые технологии 3D сканирования, искусственный интеллект для анализа геометрии и промышленные 3D принтеры последнего поколения, чтобы решать самые сложные инженерные задачи.</p>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number">1500+</div>
+                            <div class="stat-label">Успешных проектов</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-number">97%</div>
+                            <div class="stat-label">Клиентов возвращаются</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-number">42</div>
+                            <div class="stat-label">Патента</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Стран</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <img src="https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="3D печать детали">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="section services" id="services">
+        <div class="container">
+            <div class="section-title">
+                <h2>Наши услуги</h2>
+                <p>Комплексные решения для промышленности и искусства</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h3>Реверс-инжиниринг</h3>
+                    <p>Восстановление чертежей и параметров сложных деталей без исходной документации</p>
+                    <ul>
+                        <li>3D сканирование высокой точности</li>
+                        <li>Анализ материалов и структуры</li>
+                        <li>Создание полной технической документации</li>
+                    </ul>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3>Инженерная разработка</h3>
+                    <p>Проектирование и оптимизация сложных технических узлов</p>
+                    <ul>
+                        <li>Топологическая оптимизация</li>
+                        <li>Конечно-элементный анализ</li>
+                        <li>Прототипирование и тестирование</li>
+                    </ul>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-industry"></i>
+                    </div>
+                    <h3>Промышленная 3D печать</h3>
+                    <p>Производство функциональных деталей для ответственных применений</p>
+                    <ul>
+                        <li>Металлическая печать (титан, нержавеющая сталь)</li>
+                        <li>Высокотемпературные полимеры</li>
+                        <li>Композитные материалы</li>
+                    </ul>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-monument"></i>
+                    </div>
+                    <h3>3D моделирование скульптур</h3>
+                    <p>Создание художественных произведений любой сложности</p>
+                    <ul>
+                        <li>Архитектурные модели</li>
+                        <li>Художественные инсталляции</li>
+                        <li>Дизайнерские объекты</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section class="section portfolio" id="portfolio">
+        <div class="container">
+            <div class="section-title">
+                <h2>Наше портфолио</h2>
+                <p>Проекты, которыми мы гордимся</p>
+            </div>
+            <div class="portfolio-grid">
+                <div class="portfolio-item">
+                    <img src="https://images.unsplash.com/photo-1581093458799-ef0475d6ad13?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Инженерный узел">
+                    <div class="portfolio-overlay">
+                        <h3>Авиационный двигатель</h3>
+                        <p>Реверс-инжиниринг турбины для восстановления устаревшей модели</p>
+                        <span class="portfolio-tag">Аэрокосмос</span>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item">
+                    <img src="https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Деталь двигателя">
+                    <div class="portfolio-overlay">
+                        <h3>Корпус гоночного автомобиля</h3>
+                        <p>Разработка и печать облегченных компонентов для автоспорта</p>
+                        <span class="portfolio-tag">Автомобилестроение</span>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item">
+                    <img src="https://images.unsplash.com/photo-1593081891731-fda0877988da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Архитектурная модель">
+                    <div class="portfolio-overlay">
+                        <h3>Архитектурный комплекс</h3>
+                        <p>Детализированный макет для презентации инвестиционного проекта</p>
+                        <span class="portfolio-tag">Архитектура</span>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item">
+                    <img src="https://images.unsplash.com/photo-1587057175923-4c2e4f4f4a8e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Художественная скульптура">
+                    <div class="portfolio-overlay">
+                        <h3>Художественная инсталляция</h3>
+                        <p>3-метровая скульптура для международной выставки современного искусства</p>
+                        <span class="portfolio-tag">Искусство</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section contact" id="contact">
+        <div class="container">
+            <div class="section-title">
+                <h2>Свяжитесь с нами</h2>
+                <p>Готовы к реализации вашего проекта? Оставьте заявку и мы ответим в течение 30 минут</p>
+            </div>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Наши контакты</h3>
+                    <p>Мы открыты для сотрудничества и готовы обсудить ваш проект в любое удобное время.</p>
+                    
+                    <div class="contact-details">
+                        <div class="contact-detail">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <h4>Адрес</h4>
+                                <p>ул. Технопарковая, 12, Москва, Россия</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-detail">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <h4>Телефон</h4>
+                                <p>+7 (495) 765-43-21</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-detail">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h4>Email</h4>
+                                <p>projects@precision3d.ru</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-detail">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <h4>Часы работы</h4>
+                                <p>Пн-Пт: 8:00 - 20:00</p>
+                                <p>Сб: 10:00 - 18:00</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-vk"></i></a>
+                        <a href="#"><i class="fab fa-telegram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="contact-form">
+                    <form>
+                        <div class="form-group">
+                            <label for="name">Ваше имя *</label>
+                            <input type="text" id="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Телефон</label>
+                            <input type="tel" id="phone">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="service">Интересующая услуга *</label>
+                            <select id="service" required>
+                                <option value="">Выберите услугу</option>
+                                <option value="reverse">Реверс-инжиниринг</option>
+                                <option value="engineering">Инженерная разработка</option>
+                                <option value="industrial">Промышленная печать</option>
+                                <option value="sculpture">3D скульптуры</option>
+                                <option value="other">Консультация</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Опишите ваш проект *</label>
+                            <textarea id="message" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="cta-button" style="width: 100%; padding: 16px;">Отправить заявку</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <div class="footer-logo">
+                        <i class="fas fa-cube"></i>
+                        <span>Precision<span>3D</span></span>
+                    </div>
+                    <p>Лидер в области реверс-инжиниринга и промышленной 3D печати. Наши решения меняют будущее производства и дизайна.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-vk"></i></a>
+                        <a href="#"><i class="fab fa-telegram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Навигация</h3>
+                    <ul>
+                        <li><a href="#hero">Главная</a></li>
+                        <li><a href="#features">Преимущества</a></li>
+                        <li><a href="#about">О компании</a></li>
+                        <li><a href="#services">Услуги</a></li>
+                        <li><a href="#portfolio">Портфолио</a></li>
+                        <li><a href="#contact">Контакты</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Услуги</h3>
+                    <ul>
+                        <li><a href="#">Реверс-инжиниринг</a></li>
+                        <li><a href="#">Инженерная разработка</a></li>
+                        <li><a href="#">Промышленная 3D печать</a></li>
+                        <li><a href="#">3D моделирование скульптур</a></li>
+                        <li><a href="#">Консалтинг</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-newsletter">
+                    <h3>Новостная рассылка</h3>
+                    <p>Подпишитесь, чтобы получать новости о наших технологиях и кейсах</p>
+                    <div class="newsletter-form">
+                        <input type="email" placeholder="Ваш email">
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 Precision3D. Все права защищены. Разработано с <i class="fas fa-heart" style="color: #0066cc;"></i> в Москве</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenu');
+        const menu = document.getElementById('menu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            menu.classList.toggle('show');
+        });
+        
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    if (menu.classList.contains('show')) {
+                        menu.classList.remove('show');
+                    }
+                }
+            });
+        });
+        
+        // Form submission
+        const contactForm = document.querySelector('.contact-form form');
+        if (contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Спасибо за вашу заявку! Наш эксперт свяжется с вами в течение 30 минут.');
+                this.reset();
+            });
+        }
+        
+        // Header shadow on scroll
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.boxShadow = '0 5px 30px rgba(0, 0, 0, 0.1)';
+                header.style.background = 'var(--primary)';
+            } else {
+                header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+                header.style.background = 'var(--primary)';
+            }
+        });
+    </script>
+</body>
+</html>
